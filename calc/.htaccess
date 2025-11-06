@@ -1,0 +1,6 @@
+Options -Indexes
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule ^storage/ - [F,L]
+    RewriteRule ^sql/ - [F,L]
+</IfModule>

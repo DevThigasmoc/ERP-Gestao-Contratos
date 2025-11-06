@@ -1,0 +1,7 @@
+app/config.local.php
+storage/**/*.html
+storage/**/*.pdf
+storage/runtime/
+.DS_Store
+*.log
+vendor/
