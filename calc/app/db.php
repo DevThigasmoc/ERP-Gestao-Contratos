@@ -3,7 +3,9 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/helpers.php';
 
-$appConfig = require __DIR__ . '/config.php';
+if (!isset($appConfig)) {
+    $appConfig = require __DIR__ . '/config.php';
+}
 
 function db(): PDO
 {

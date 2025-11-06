@@ -27,13 +27,13 @@ $recentProposals = array_slice($recentProposals, 0, 10);
 <header class="app-header">
     <div class="logo">Painel KAVVI</div>
     <nav>
-        <a href="/index.php">Calculadora</a>
+        <a href="<?= route('/index.php'); ?>">Calculadora</a>
         <?php if (in_array($user['perfil'], ['admin', 'gestor'], true)): ?>
-            <a href="/admin/users.php">Usuários</a>
+            <a href="<?= route('/admin/users.php'); ?>">Usuários</a>
         <?php endif; ?>
-        <a href="/admin/proposals.php">Propostas</a>
-        <a href="/admin/contracts.php">Contratos</a>
-        <a href="/auth/logout.php">Sair</a>
+        <a href="<?= route('/admin/proposals.php'); ?>">Propostas</a>
+        <a href="<?= route('/admin/contracts.php'); ?>">Contratos</a>
+        <a href="<?= route('/auth/logout.php'); ?>">Sair</a>
     </nav>
 </header>
 <main class="layout">
@@ -64,7 +64,7 @@ $recentProposals = array_slice($recentProposals, 0, 10);
                             <td><?= sanitize($proposal['vendedor_nome']); ?></td>
                             <td><span class="badge badge-status-<?= sanitize($proposal['status']); ?>"><?= sanitize($proposal['status']); ?></span></td>
                             <td><?= date('d/m/Y H:i', strtotime($proposal['created_at'])); ?></td>
-                            <td><a class="btn-link" href="/index.php?proposal=<?= (int) $proposal['id']; ?>">Abrir</a></td>
+                            <td><a class="btn-link" href="<?= route('/index.php'); ?>?proposal=<?= (int) $proposal['id']; ?>">Abrir</a></td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>

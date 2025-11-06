@@ -37,7 +37,7 @@ if ($user['perfil'] !== 'vendedor') {
 $proposals = $repo->list($filters, $user);
 $usersList = [];
 if ($user['perfil'] !== 'vendedor') {
-    $userRepo = new UserRepository();
+    $userRepo = new UserRepository(current_company_id());
     $usersList = $userRepo->all();
 }
 $token = csrf_token();
@@ -53,12 +53,12 @@ $token = csrf_token();
 <header class="app-header">
     <div class="logo">Painel KAVVI</div>
     <nav>
-        <a href="/admin/index.php">Dashboard</a>
+        <a href="<?= route('/admin/index.php'); ?>">Dashboard</a>
         <?php if (in_array($user['perfil'], ['admin'], true)): ?>
-            <a href="/admin/users.php">Usuários</a>
+            <a href="<?= route('/admin/users.php'); ?>">Usuários</a>
         <?php endif; ?>
-        <a href="/admin/contracts.php">Contratos</a>
-        <a href="/auth/logout.php">Sair</a>
+        <a href="<?= route('/admin/contracts.php'); ?>">Contratos</a>
+        <a href="<?= route('/auth/logout.php'); ?>">Sair</a>
     </nav>
 </header>
 <main class="layout">
@@ -108,8 +108,8 @@ $token = csrf_token();
                             <td><span class="badge badge-status-<?= sanitize($proposal['status']); ?>"><?= sanitize($proposal['status']); ?></span></td>
                             <td><?= date('d/m/Y H:i', strtotime($proposal['updated_at'])); ?></td>
                             <td>
-                                <a class="btn-link" href="/index.php?proposal=<?= (int) $proposal['id']; ?>">Abrir</a>
-                                <a class="btn-link" href="/propostas/ver.php?token=<?= urlencode($proposal['share_token']); ?>" target="_blank">Link público</a>
+                                <a class="btn-link" href="<?= route('/index.php'); ?>?proposal=<?= (int) $proposal['id']; ?>">Abrir</a>
+                                <a class="btn-link" href="<?= route('/propostas/ver.php'); ?>?token=<?= urlencode($proposal['share_token']); ?>" target="_blank">Link público</a>
                                 <?php if ($proposal['status'] !== 'fechada'): ?>
                                     <form method="post" class="inline-form">
                                         <input type="hidden" name="_token" value="<?= sanitize($token); ?>">

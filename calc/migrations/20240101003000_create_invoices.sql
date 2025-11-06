@@ -1,0 +1,21 @@
+CREATE TABLE IF NOT EXISTS invoices (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    company_id INT NOT NULL,
+    subscription_id INT NOT NULL,
+    vendor_user_id INT NULL,
+    efi_charge_id VARCHAR(64) NULL,
+    number VARCHAR(50) NULL,
+    txid VARCHAR(64) NULL,
+    due_date DATE NOT NULL,
+    amount_gross DECIMAL(10,2) NOT NULL,
+    amount_discount DECIMAL(10,2) DEFAULT 0,
+    amount_net DECIMAL(10,2) NOT NULL,
+    status ENUM('pending','paid','overdue','canceled') DEFAULT 'pending',
+    paid_at DATETIME NULL,
+    payment_method ENUM('pix','boleto','card') DEFAULT 'pix',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_invoices_company (company_id, subscription_id, status),
+    CONSTRAINT fk_invoices_company FOREIGN KEY (company_id) REFERENCES companies(id),
+    CONSTRAINT fk_invoices_subscription FOREIGN KEY (subscription_id) REFERENCES subscriptions(id)
+);

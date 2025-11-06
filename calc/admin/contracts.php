@@ -16,7 +16,7 @@ if ($user['perfil'] !== 'vendedor') {
 $contracts = $repo->list($filters, $user);
 $usersList = [];
 if ($user['perfil'] !== 'vendedor') {
-    $userRepo = new UserRepository();
+    $userRepo = new UserRepository(current_company_id());
     $usersList = $userRepo->all();
 }
 ?>
@@ -31,12 +31,12 @@ if ($user['perfil'] !== 'vendedor') {
 <header class="app-header">
     <div class="logo">Painel KAVVI</div>
     <nav>
-        <a href="/admin/index.php">Dashboard</a>
+        <a href="<?= route('/admin/index.php'); ?>">Dashboard</a>
         <?php if (in_array($user['perfil'], ['admin'], true)): ?>
-            <a href="/admin/users.php">Usuários</a>
+            <a href="<?= route('/admin/users.php'); ?>">Usuários</a>
         <?php endif; ?>
-        <a href="/admin/proposals.php">Propostas</a>
-        <a href="/auth/logout.php">Sair</a>
+        <a href="<?= route('/admin/proposals.php'); ?>">Propostas</a>
+        <a href="<?= route('/auth/logout.php'); ?>">Sair</a>
     </nav>
 </header>
 <main class="layout">
@@ -71,14 +71,14 @@ if ($user['perfil'] !== 'vendedor') {
                     <?php foreach ($contracts as $contract): ?>
                         <tr>
                             <td>#<?= (int) $contract['id']; ?></td>
-                            <td><a href="/index.php?proposal=<?= (int) $contract['proposal_id']; ?>">#<?= (int) $contract['proposal_id']; ?></a></td>
+                            <td><a href="<?= route('/index.php'); ?>?proposal=<?= (int) $contract['proposal_id']; ?>">#<?= (int) $contract['proposal_id']; ?></a></td>
                             <td><?= sanitize($contract['empresa_nome']); ?></td>
                             <td><?= sanitize($contract['vendedor_nome']); ?></td>
                             <td><?= sanitize($contract['status']); ?></td>
                             <td><?= date('d/m/Y H:i', strtotime($contract['created_at'])); ?></td>
                             <td>
                                 <?php if (!empty($contract['pdf_path']) && file_exists($contract['pdf_path'])): ?>
-                                    <a class="btn-link" href="/admin/download.php?id=<?= (int) $contract['id']; ?>&type=contract">Baixar</a>
+                                    <a class="btn-link" href="<?= route('/admin/download.php'); ?>?id=<?= (int) $contract['id']; ?>&type=contract">Baixar</a>
                                 <?php else: ?>
                                     <span class="badge">Arquivo não encontrado</span>
                                 <?php endif; ?>

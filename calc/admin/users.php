@@ -5,7 +5,7 @@ require_once __DIR__ . '/../app/bootstrap.php';
 
 require_auth(['admin']);
 
-$repo = new UserRepository();
+$repo = new UserRepository(current_company_id());
 $user = current_user();
 $error = null;
 $message = null;
@@ -34,6 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     throw new RuntimeException('Informe uma senha com pelo menos 6 caracteres.');
                 }
                 $payload['password_hash'] = password_hash($password, PASSWORD_BCRYPT);
+                $payload['company_id'] = current_company_id();
                 $newId = $repo->create($payload);
                 record_audit($user['id'], 'criou_usuario', 'user', $newId, ['perfil' => $payload['perfil']]);
                 $message = 'Usuário criado com sucesso!';
@@ -68,10 +69,10 @@ $token = csrf_token();
 <header class="app-header">
     <div class="logo">Painel KAVVI</div>
     <nav>
-        <a href="/admin/index.php">Dashboard</a>
-        <a href="/admin/proposals.php">Propostas</a>
-        <a href="/admin/contracts.php">Contratos</a>
-        <a href="/auth/logout.php">Sair</a>
+        <a href="<?= route('/admin/index.php'); ?>">Dashboard</a>
+        <a href="<?= route('/admin/proposals.php'); ?>">Propostas</a>
+        <a href="<?= route('/admin/contracts.php'); ?>">Contratos</a>
+        <a href="<?= route('/auth/logout.php'); ?>">Sair</a>
     </nav>
 </header>
 <main class="layout">
@@ -109,7 +110,7 @@ $token = csrf_token();
                 </div>
                 <button type="submit" class="btn-primary">Salvar</button>
                 <?php if ($editingUser): ?>
-                    <a class="btn-link" href="/admin/users.php">Cancelar</a>
+                    <a class="btn-link" href="<?= route('/admin/users.php'); ?>">Cancelar</a>
                 <?php endif; ?>
             </form>
         </div>

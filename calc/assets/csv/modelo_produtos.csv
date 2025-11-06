@@ -1,0 +1,6 @@
+type,key_slug,label,unit_price,per_user,recurring,billing_cycle,max_discount_percent,active,sort_order
+plan,kavvi_start,Plano KAVVI Start,149.90,1,1,monthly,15,1,1
+plan,kavvi_plus,Plano KAVVI Plus,229.90,1,1,monthly,15,1,2
+addon,impressora_termica,Impressora Térmica,850.00,0,0,one_time,5,1,10
+service,suporte_premium,Suporte Premium,99.90,1,1,monthly,5,1,20
+setup,implantacao,Implantação Completa,1200.00,0,0,one_time,0,1,30

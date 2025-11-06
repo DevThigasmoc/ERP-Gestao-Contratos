@@ -42,7 +42,7 @@ $items = $repo->findItems((int) $proposal['id']);
     <div class="public-container">
 
         <header class="kavvi-head">
-            <img src="<?= asset('assets/img/kavvi-logo.png'); ?>" alt="KAVVI">
+            <img src="<?= asset('assets/kavvi-logo.png'); ?>" alt="KAVVI">
             <div>
               <h1>Proposta Comercial</h1>
               <small>KAVVI CRM — A fluidez que conecta vendas e atendimento.</small>
