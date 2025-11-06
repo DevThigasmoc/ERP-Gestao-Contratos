@@ -1,0 +1,20 @@
+CREATE TABLE IF NOT EXISTS subscriptions (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    company_id INT NOT NULL,
+    proposal_id INT NOT NULL,
+    customer_doc VARCHAR(20) NOT NULL,
+    customer_name VARCHAR(160) NOT NULL,
+    vendor_user_id INT NULL,
+    plan_key VARCHAR(50) NOT NULL,
+    users_qtd INT NOT NULL,
+    base_price DECIMAL(10,2) NOT NULL,
+    pague_em_dia_percent DECIMAL(5,2) DEFAULT 0,
+    status ENUM('active','suspended','canceled') DEFAULT 'active',
+    start_date DATE NOT NULL,
+    end_date DATE NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_subscriptions_company (company_id),
+    INDEX idx_subscriptions_status (status),
+    CONSTRAINT fk_subscriptions_company FOREIGN KEY (company_id) REFERENCES companies(id)
+);

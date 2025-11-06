@@ -1,5 +1,2 @@
-<IfModule mod_php.c>
-    php_flag engine off
-</IfModule>
-Options -Indexes
+Order allow,deny
 Deny from all

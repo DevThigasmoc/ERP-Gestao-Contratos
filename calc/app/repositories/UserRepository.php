@@ -6,10 +6,12 @@ require_once __DIR__ . '/../db.php';
 class UserRepository
 {
     private PDO $pdo;
+    private ?int $companyId;
 
-    public function __construct()
+    public function __construct(?int $companyId = null)
     {
         $this->pdo = db();
+        $this->companyId = $companyId;
     }
 
     public function findByEmail(string $email): ?array
@@ -22,8 +24,13 @@ class UserRepository
 
     public function findById(int $id): ?array
     {
-        $stmt = $this->pdo->prepare('SELECT * FROM users WHERE id = :id');
-        $stmt->execute([':id' => $id]);
+        if ($this->companyId !== null) {
+            $stmt = $this->pdo->prepare('SELECT * FROM users WHERE id = :id AND company_id = :company_id');
+            $stmt->execute([':id' => $id, ':company_id' => $this->companyId]);
+        } else {
+            $stmt = $this->pdo->prepare('SELECT * FROM users WHERE id = :id');
+            $stmt->execute([':id' => $id]);
+        }
         $user = $stmt->fetch();
         return $user ?: null;
     }
@@ -39,6 +46,11 @@ class UserRepository
         $sql = 'SELECT * FROM users';
         $conditions = [];
         $params = [];
+
+        if ($this->companyId !== null) {
+            $conditions[] = 'company_id = :company_id';
+            $params[':company_id'] = $this->companyId;
+        }
 
         if (isset($filters['perfil']) && $filters['perfil'] !== '') {
             $conditions[] = 'perfil = :perfil';
@@ -64,8 +76,9 @@ class UserRepository
 
     public function create(array $data): int
     {
-        $stmt = $this->pdo->prepare('INSERT INTO users (nome, email, password_hash, perfil, ativo, created_at, updated_at) VALUES (:nome, :email, :password_hash, :perfil, :ativo, NOW(), NOW())');
+        $stmt = $this->pdo->prepare('INSERT INTO users (company_id, nome, email, password_hash, perfil, ativo, created_at, updated_at) VALUES (:company_id, :nome, :email, :password_hash, :perfil, :ativo, NOW(), NOW())');
         $stmt->execute([
+            ':company_id' => $data['company_id'] ?? $this->companyId,
             ':nome' => $data['nome'],
             ':email' => $data['email'],
             ':password_hash' => $data['password_hash'],
@@ -93,13 +106,23 @@ class UserRepository
         }
 
         $sql = 'UPDATE users SET ' . implode(', ', $fields) . ' WHERE id = :id';
+        if ($this->companyId !== null) {
+            $sql .= ' AND company_id = :company_id';
+            $params[':company_id'] = $this->companyId;
+        }
+
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute($params);
     }
 
     public function deactivate(int $id): void
     {
-        $stmt = $this->pdo->prepare('UPDATE users SET ativo = 0, updated_at = NOW() WHERE id = :id');
-        $stmt->execute([':id' => $id]);
+        if ($this->companyId !== null) {
+            $stmt = $this->pdo->prepare('UPDATE users SET ativo = 0, updated_at = NOW() WHERE id = :id AND company_id = :company_id');
+            $stmt->execute([':id' => $id, ':company_id' => $this->companyId]);
+        } else {
+            $stmt = $this->pdo->prepare('UPDATE users SET ativo = 0, updated_at = NOW() WHERE id = :id');
+            $stmt->execute([':id' => $id]);
+        }
     }
 }

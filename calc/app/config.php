@@ -1,11 +1,17 @@
 <?php
 declare(strict_types=1);
 
+require_once __DIR__ . '/Config/Config.php';
+
+use App\Config\Config;
+
 if (!defined('BASE_PATH')) {
     define('BASE_PATH', dirname(__DIR__));
 }
 
 date_default_timezone_set('America/Sao_Paulo');
+
+$configLoader = new Config(BASE_PATH . '/.env');
 
 $appConfig = [
     'name' => 'KAVVI Calculadora',
@@ -33,11 +39,34 @@ if (file_exists($localConfigPath)) {
     }
 }
 
-$appConfig['db']['host'] = getenv('DB_HOST') ?: $appConfig['db']['host'];
-$appConfig['db']['name'] = getenv('DB_NAME') ?: $appConfig['db']['name'];
-$appConfig['db']['user'] = getenv('DB_USER') ?: $appConfig['db']['user'];
-$appConfig['db']['pass'] = getenv('DB_PASS') ?: $appConfig['db']['pass'];
-$appConfig['db']['charset'] = getenv('DB_CHARSET') ?: $appConfig['db']['charset'];
+$appConfig['db']['host'] = $configLoader->getEnv('DB_HOST', $appConfig['db']['host']);
+$appConfig['db']['name'] = $configLoader->getEnv('DB_NAME', $appConfig['db']['name']);
+$appConfig['db']['user'] = $configLoader->getEnv('DB_USER', $appConfig['db']['user']);
+$appConfig['db']['pass'] = $configLoader->getEnv('DB_PASS', $appConfig['db']['pass']);
+$appConfig['db']['charset'] = $configLoader->getEnv('DB_CHARSET', $appConfig['db']['charset']);
+
+$appConfig['app_base_path'] = rtrim($configLoader->getEnv('APP_BASE_PATH', '/calc'), '/');
+
+if (!defined('APP_BASE_PATH')) {
+    define('APP_BASE_PATH', $appConfig['app_base_path'] ?: '/calc');
+}
+
+$appConfig['finance'] = [
+    'efi' => [
+        'client_id' => $configLoader->getEnv('EFI_CLIENT_ID', ''),
+        'client_secret' => $configLoader->getEnv('EFI_CLIENT_SECRET', ''),
+        'sandbox' => filter_var($configLoader->getEnv('EFI_SANDBOX', 'true'), FILTER_VALIDATE_BOOL),
+        'cert_path' => $configLoader->getEnv('EFI_CERT_PATH'),
+        'cert_pass' => $configLoader->getEnv('EFI_CERT_PASS'),
+        'pix_key' => $configLoader->getEnv('EFI_PIX_KEY', ''),
+    ],
+    'commission' => [
+        'default_rate' => (float) $configLoader->getEnv('DEFAULT_COMMISSION_RATE', '0.10'),
+        'splits' => (int) $configLoader->getEnv('COMMISSION_SPLITS', '6'),
+        'due_day' => (int) $configLoader->getEnv('COMMISSION_DUE_DAY', '5'),
+    ],
+    'webhook_secret' => $configLoader->getEnv('WEBHOOK_SHARED_SECRET', ''),
+];
 
 $appConfig['plans'] = [
     'kavvi_start' => [

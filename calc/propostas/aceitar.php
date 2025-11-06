@@ -73,6 +73,22 @@ try {
   $service  = new ProposalService($appConfig);
   $result   = $service->generateContract($proposalId, $userCtx); // retorna ['id'=>.., 'pdf_path'=>..]
 
+  $companyId = (int) ($owner['company_id'] ?? 0);
+  if ($companyId > 0) {
+      $subscriptionRepo = new \App\Repositories\SubscriptionRepository();
+      $subscriptionRepo->createOrUpdateFromProposal($companyId, $proposal, [
+          'customer_doc' => $doc,
+          'customer_name' => $name,
+          'vendor_user_id' => (int) $proposal['user_id'],
+          'plan_key' => $proposal['plano_key'],
+          'users_qtd' => (int) $proposal['usuarios_qtd'],
+          'base_price' => (float) $proposal['mensalidade_base'],
+          'pague_em_dia_percent' => (float) $proposal['pague_em_dia_percent'],
+          'status' => 'active',
+          'start_date' => date('Y-m-d'),
+      ]);
+  }
+
   $pdo->commit();
   echo json_encode(['ok' => true, 'contract_path' => $result['pdf_path'] ?? null]);
 } catch (Throwable $e) {

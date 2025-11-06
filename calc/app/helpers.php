@@ -4,16 +4,81 @@ declare(strict_types=1);
 function base_path(string $path = ''): string
 {
     $base = dirname(__DIR__);
-    return rtrim($base . '/' . ltrim($path, '/'), '/');
+    $path = ltrim($path, '/');
+    return $path !== '' ? $base . '/' . $path : $base;
+}
+
+function app_base_path(): string
+{
+    return defined('APP_BASE_PATH') ? rtrim(APP_BASE_PATH, '/') : '/calc';
 }
 
 function asset(string $path): string
 {
-    return '/' . ltrim($path, '/');
+    $base = app_base_path();
+    return $base . '/' . ltrim($path, '/');
 }
 
-function redirect(string $location): void
+function route(string $path): string
 {
+    return asset(ltrim($path, '/'));
+}
+
+function current_company_id(): int
+{
+    $user = current_user();
+    if ($user && isset($user['company_id'])) {
+        return (int) $user['company_id'];
+    }
+
+    return (int) ($_SESSION['company_id'] ?? 0);
+}
+
+function load_company_finance_config(int $companyId, array $defaults = []): array
+{
+    if ($companyId <= 0) {
+        return $defaults;
+    }
+
+    $path = base_path('storage/company_settings');
+    ensure_dir($path);
+    $file = $path . '/company_' . $companyId . '.json';
+
+    if (!is_file($file)) {
+        return $defaults;
+    }
+
+    $content = file_get_contents($file);
+    if ($content === false) {
+        return $defaults;
+    }
+
+    $data = json_decode($content, true);
+    if (!is_array($data)) {
+        return $defaults;
+    }
+
+    return array_merge($defaults, $data);
+}
+
+function save_company_finance_config(int $companyId, array $data): void
+{
+    if ($companyId <= 0) {
+        return;
+    }
+
+    $path = base_path('storage/company_settings');
+    ensure_dir($path);
+    $file = $path . '/company_' . $companyId . '.json';
+    file_put_contents($file, json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+}
+
+function redirect(string $location, bool $absolute = false): void
+{
+    if (!$absolute && str_starts_with($location, '/')) {
+        $location = route($location);
+    }
+
     header('Location: ' . $location);
     exit;
 }
